@@ -1,0 +1,811 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sorteio 10 Facas</title>
+<!--
+  Animação do sorteio de 10 facas — Danoco × G4skins.
+
+  Abra no navegador ou use como "Fonte de navegador" no OBS.
+  Parâmetros de URL:
+    ?formato=vertical   versão 1080×1920 (Reels / TikTok / Shorts). Padrão: 1920×1080.
+    ?t=12.5             congela a animação nesse segundo (útil para tirar print / thumb).
+    ?loop=0             toca uma vez e para no card final.
+  Os textos editáveis ficam no objeto CONFIG, logo no começo do <script>.
+-->
+<style>
+@font-face{font-family:'Limelight';src:url(assets/fonts/limelight.woff2) format('woff2');font-display:block}
+@font-face{font-family:'Josefin Sans';src:url(assets/fonts/josefin-sans.woff2) format('woff2');font-weight:100 700;font-display:block}
+
+:root{
+  --ink:#0a0211;
+  --plum:#1b0630;
+  --violet:#3e0f6e;
+  --g4:#b23cff;
+  --pink:#ff4fd0;
+  --gold-d:#9a6716;
+  --gold:#e6b545;
+  --gold-l:#fbe29a;
+  --cream:#fff3d2;
+  --live:#ff2d55;
+}
+html,body{margin:0;height:100%;background:#000;overflow:hidden}
+#stage{
+  position:absolute;left:50%;top:50%;overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% 55%, #3a0d63 0%, #220741 38%, #12031f 72%, #07010d 100%);
+  font-family:'Josefin Sans',sans-serif;color:var(--cream);
+}
+.layer,.scene{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.scene{transform-origin:50% 50%}
+.abs{position:absolute;left:0;top:0;will-change:transform,opacity;white-space:nowrap}
+svg{overflow:visible}
+
+/* tipografia */
+.deco{font-family:'Limelight',serif;line-height:1;letter-spacing:.02em}
+.gold{
+  background-image:
+    linear-gradient(100deg, rgba(255,255,255,0) 44%, rgba(255,255,255,.95) 50%, rgba(255,255,255,0) 56%),
+    linear-gradient(180deg, #fff6cf 0%, #f8d877 26%, #c78d27 49%, #f3cf6b 60%, #fff0b5 77%, #a8711a 100%);
+  background-repeat:no-repeat;background-size:0 0,100% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .055em 0 #3b0b5f) drop-shadow(0 0 .25em rgba(230,181,69,.35));
+}
+.violet3d{color:#fff;filter:drop-shadow(0 .055em 0 #5a1494) drop-shadow(0 0 .3em rgba(178,60,255,.65))}
+.cream3d{color:var(--cream);filter:drop-shadow(0 .055em 0 #3b0b5f) drop-shadow(0 0 .3em rgba(255,79,208,.35))}
+.label{font-weight:700;text-transform:uppercase;letter-spacing:.45em;line-height:1}
+.pink{color:var(--pink);text-shadow:0 0 18px rgba(255,79,208,.55)}
+.goldtxt{color:var(--gold-l);text-shadow:0 0 16px rgba(230,181,69,.45)}
+
+.row{display:flex;align-items:center;gap:.35em}
+.col{display:flex;flex-direction:column;align-items:center}
+.dia{display:inline-block;width:.42em;height:.42em;transform:rotate(45deg);background:var(--gold);margin:0 .9em;vertical-align:.12em;box-shadow:0 0 10px rgba(230,181,69,.6)}
+
+/* fundo */
+#streaks div{position:absolute;width:260%;height:120px;left:-80%;border-radius:60px;
+  background:linear-gradient(90deg,rgba(255,79,208,0),rgba(255,79,208,.55) 40%,rgba(178,60,255,.6) 60%,rgba(178,60,255,0));
+  filter:blur(38px);mix-blend-mode:screen;will-change:transform,opacity}
+#vignette{background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%)}
+#grain{opacity:.075;mix-blend-mode:overlay;background-repeat:repeat}
+#flash{background:radial-gradient(circle at 50% 50%, rgba(255,240,200,.55), rgba(255,240,200,0) 60%);opacity:0;mix-blend-mode:screen}
+
+.draw{stroke-dasharray:1 1;stroke-dashoffset:1}
+
+/* cena A */
+#aMed img{position:absolute;left:50%;top:50%;width:47%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 22px rgba(255,255,255,.35)) drop-shadow(0 0 60px rgba(178,60,255,.9))}
+#aRow{font-size:104px}
+#aX{font-family:'Josefin Sans';font-weight:300;font-size:.8em;color:var(--gold-l);margin:0 .25em}
+#aSub{font-size:34px}
+
+/* cena B */
+#bTitle{font-size:236px}
+#bTitle span{display:inline-block}
+#bRow{gap:46px}
+#bNumBox{position:relative;display:flex;justify-content:center;align-items:center}
+#bNum{font-size:360px;text-align:center}
+#bRing{position:absolute;left:50%;top:50%;width:520px;height:520px;transform:translate(-50%,-50%)}
+#bFacas{font-size:178px}
+#bSkins{font-size:40px;margin-top:26px}
+#bRight{align-items:flex-start}
+
+/* cena C */
+#cPlaque{font-size:30px;padding:22px 46px 18px}
+#cKicker{font-size:30px}
+#cNameMask{overflow:hidden;height:150px;width:1400px}
+#cNameMask .deco{position:absolute;left:50%;top:50%;font-size:126px;will-change:transform}
+#cDots{display:flex;gap:30px}
+#cDots i{display:block;width:16px;height:16px;transform:rotate(45deg);border:2px solid var(--gold);box-sizing:border-box}
+.knife{position:absolute;left:0;top:0;will-change:transform,opacity}
+#sC .knife{filter:drop-shadow(0 0 2px rgba(255,230,160,.6)) drop-shadow(0 0 34px rgba(178,60,255,.9)) drop-shadow(0 30px 40px rgba(0,0,0,.7))}
+#sD .knife{filter:drop-shadow(0 0 2px rgba(255,230,160,.5)) drop-shadow(0 0 22px rgba(178,60,255,.85))}
+.qmark{font-family:'Josefin Sans';font-weight:700;color:var(--ink);background:var(--gold);border-radius:50%;width:1.3em;height:1.3em;display:inline-flex;align-items:center;justify-content:center;margin-left:.9em;letter-spacing:0;font-size:1.05em;vertical-align:middle}
+
+/* cena D */
+#dTitle{font-size:66px}
+#dNames{font-size:32px}
+
+/* cena E */
+#eImg{width:700px;filter:drop-shadow(0 0 40px rgba(178,60,255,.55)) drop-shadow(0 30px 40px rgba(0,0,0,.6))}
+#eKicker{font-size:44px}
+#eTitle{font-size:150px}
+#eDate{font-size:64px;padding:34px 60px 26px}
+#ePartners{font-size:38px;font-weight:700;letter-spacing:.2em}
+#ePartners img{height:52px;margin-right:22px}
+#eCta{font-size:34px}
+#eCta b{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--live);margin-right:20px;box-shadow:0 0 16px var(--live);vertical-align:2px}
+.box{position:relative}
+.box>svg.boxbg{position:absolute;left:0;top:0;z-index:-1}
+.boxwrap{isolation:isolate}
+
+/* formato vertical */
+#stage.v #aRow{flex-direction:column;font-size:124px;gap:10px}
+#stage.v #aX{margin:.05em 0}
+#stage.v #bTitle{font-size:178px}
+#stage.v #bRow{flex-direction:column;gap:0}
+#stage.v #bRight{align-items:center}
+#stage.v #bNum{font-size:440px}
+#stage.v #bRing{width:600px;height:600px}
+#stage.v #bFacas{font-size:190px}
+#stage.v #cNameMask{width:1000px;height:170px}
+#stage.v #cNameMask .deco{font-size:140px}
+#stage.v #dTitle{font-size:150px}
+#stage.v #dTitle .t2{font-size:.32em;display:block;margin-top:32px;letter-spacing:.4em;font-family:'Josefin Sans';font-weight:700}
+#stage.v #dTitle .sep{display:none}
+#stage.v #dNames{font-size:34px;white-space:normal;width:860px;text-align:center;line-height:2}
+#stage.v #eImg{width:860px}
+#stage.v #eTitle{font-size:156px}
+#stage.v #eDate{font-size:64px;padding:36px 70px 28px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <!-- definições compartilhadas (gradientes, recortes) -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs id="defs">
+      <linearGradient id="silh" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2a0f40"/><stop offset=".45" stop-color="#12051d"/><stop offset="1" stop-color="#05010a"/>
+      </linearGradient>
+      <linearGradient id="goldStroke" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff2c0"/><stop offset=".35" stop-color="#e6b545"/><stop offset=".6" stop-color="#fbe29a"/><stop offset="1" stop-color="#a8711a"/>
+      </linearGradient>
+      <linearGradient id="glintG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="rayG" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="scale(1500)">
+        <stop offset="0" stop-color="#fbe29a" stop-opacity=".34"/><stop offset=".35" stop-color="#e6b545" stop-opacity=".09"/><stop offset="1" stop-color="#e6b545" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="spot" cx=".5" cy=".42" r=".6">
+        <stop offset="0" stop-color="#b23cff" stop-opacity=".42"/><stop offset=".55" stop-color="#6a17b0" stop-opacity=".12"/><stop offset="1" stop-color="#2a0848" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="medFill" cx=".5" cy=".4" r=".7">
+        <stop offset="0" stop-color="#6c1bb8"/><stop offset=".6" stop-color="#2c0a4d"/><stop offset="1" stop-color="#14041f"/>
+      </radialGradient>
+    </defs>
+  </svg>
+
+  <div class="layer" id="bg"></div>
+  <svg class="layer" id="rays"></svg>
+  <div class="layer" id="streaks"><div></div><div></div><div></div></div>
+  <canvas class="layer" id="dust"></canvas>
+  <div class="layer" id="flash"></div>
+
+  <!-- CENA A · abertura -->
+  <div class="scene" id="sA">
+    <div class="abs" id="aMed"><svg class="medal" id="aMedSvg"></svg><img src="assets/g4-pantera.png" alt=""></div>
+    <div class="abs row" id="aRow">
+      <span class="deco gold" id="aDan">DANOCO</span>
+      <span id="aX">×</span>
+      <span class="deco violet3d" id="aG4">G4SKINS</span>
+    </div>
+    <div class="abs label goldtxt" id="aSub" data-cfg="apresentam"></div>
+  </div>
+
+  <!-- CENA B · título -->
+  <div class="scene" id="sB">
+    <div class="abs deco" id="bTitle"></div>
+    <svg class="abs" id="bDiv"></svg>
+    <div class="abs row" id="bRow">
+      <div id="bNumBox"><svg id="bRing" viewBox="-100 -100 200 200"></svg><span class="deco gold" id="bNum">10</span></div>
+      <div class="col" id="bRight">
+        <span class="deco cream3d" id="bFacas">FACAS</span>
+        <span class="label pink" id="bSkins">SKINS ALEATÓRIAS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENA C · revelação dos modelos -->
+  <div class="scene" id="sC">
+    <svg class="abs" id="cArch"></svg>
+    <div id="cKnives"></div>
+    <div class="abs boxwrap" id="cPlaqueWrap"><div class="box label goldtxt" id="cPlaque">SKIN ALEATÓRIA<span class="qmark" id="cQ">?</span></div></div>
+    <div class="abs label pink" id="cKicker"></div>
+    <div class="abs" id="cNameMask"></div>
+    <div class="abs" id="cDots"><i></i><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- CENA D · leque com todos os modelos -->
+  <div class="scene" id="sD">
+    <div id="dKnives"></div>
+    <div class="abs" id="dMed"><svg class="medal" id="dMedSvg"></svg><img src="assets/g4-pantera.png" alt="" style="position:absolute;left:50%;top:50%;width:52%;transform:translate(-50%,-50%)"></div>
+    <div class="abs deco gold" id="dTitle"><span data-cfg="quantidadeTexto"></span><span class="sep"> · </span><span class="t2 goldtxt" style="background:none;-webkit-background-clip:initial;background-clip:initial">SKINS ALEATÓRIAS</span></div>
+    <div class="abs label goldtxt" id="dNames"></div>
+  </div>
+
+  <!-- CENA E · card final -->
+  <div class="scene" id="sE">
+    <svg class="abs" id="eArch"></svg>
+    <img class="abs" id="eImg" src="assets/danoco.png" alt="">
+    <div class="abs label pink" id="eKicker">SORTEIO DE</div>
+    <div class="abs deco gold" id="eTitle" data-cfg="quantidadeTexto"></div>
+    <svg class="abs" id="eDiv"></svg>
+    <div class="abs boxwrap" id="eDateWrap"><div class="box deco cream3d" id="eDate" data-cfg="data"></div></div>
+    <div class="abs row" id="ePartners"><img src="assets/g4-pantera.png" alt=""><span class="goldtxt">DANOCO</span><span style="color:var(--gold-l);font-weight:300;margin:0 .35em">×</span><span style="color:#fff;text-shadow:0 0 16px rgba(178,60,255,.9)">G4SKINS</span></div>
+    <div class="abs label" id="eCta"><b></b><span data-cfg="chamada"></span></div>
+  </div>
+
+  <svg class="layer" id="frame"></svg>
+  <div class="layer" id="vignette"></div>
+  <div class="layer" id="grain"></div>
+</div>
+
+<script>
+/* ===================== TEXTOS EDITÁVEIS ===================== */
+const CONFIG = {
+  quantidadeTexto: '10 FACAS',
+  data: 'FINAL DE OUTUBRO',
+  chamada: 'FIQUE LIGADO NA LIVE',
+  apresentam: 'APRESENTAM',
+  modelos: ['NAVAJA', 'SURVIVAL', 'PARACORD', 'KUKRI'],
+};
+/* ============================================================ */
+
+const params = new URLSearchParams(location.search);
+const VERTICAL = params.get('formato') === 'vertical';
+const W = VERTICAL ? 1080 : 1920, H = VERTICAL ? 1920 : 1080;
+const DUR = 28;                       // duração do loop em segundos
+const LOOP = params.get('loop') !== '0';
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const stage = $('stage');
+stage.classList.add(VERTICAL ? 'v' : 'h');
+stage.style.width = W + 'px'; stage.style.height = H + 'px';
+
+document.querySelectorAll('[data-cfg]').forEach(el => { el.textContent = CONFIG[el.dataset.cfg]; });
+
+/* ---------- silhuetas das facas (viewBox 0 0 600 150, lâmina para a direita) ---------- */
+const KNIVES = {
+  navaja: 'M 292 58 L 304 55 L 318 55 L 336 55 L 470 53 Q 545 51 596 36 Q 566 72 505 82 Q 420 92 344 88 L 334 86 L 326 93 L 292 90 Q 200 98 118 94 Q 58 92 16 110 Q 22 90 48 78 Q 70 68 120 64 Q 210 58 292 58 Z M 312 73 a 6 6 0 1 0 12 0 a 6 6 0 1 0 -12 0 Z M 76.5 80 a 3.5 3.5 0 1 0 7.0 0 a 3.5 3.5 0 1 0 -7.0 0 Z',
+  survival: 'M 258 50 L 268 50 L 272.9 41.0 L 282.0 50.0 L 286.9 41.0 L 296.0 50.0 L 300.9 41.0 L 310.0 50.0 L 314.9 41.0 L 324.0 50.0 L 328.9 41.0 L 338.0 50.0 L 342.9 41.0 L 352.0 50.0 L 356.9 41.0 L 366.0 50.0 L 370.9 41.0 L 380.0 50.0 L 384.9 41.0 L 394.0 50.0 L 440 50 Q 530 52 594 72 Q 566 96 496 100 L 284 100 Q 272 100 268 110 L 262 124 L 250 124 L 248 100 L 232 98 Q 220 108 206 98 Q 192 108 178 98 Q 164 108 150 98 L 52 98 L 32 104 L 18 96 L 18 54 L 32 46 L 52 52 L 248 52 L 250 36 L 260 36 Z M 300 66 L 420 66 Q 428 70 420 74 L 300 74 Q 294 70 300 66 Z M 27 75 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 Z',
+  paracord: 'M 250 50 L 262 50 L 264.8 45.0 L 270.0 50.0 L 272.8 45.0 L 278.0 50.0 L 280.8 45.0 L 286.0 50.0 L 288.8 45.0 L 294.0 50.0 L 296.8 45.0 L 302.0 50.0 L 304.8 45.0 L 310.0 50.0 L 312.8 45.0 L 318.0 50.0 L 400 46 Q 520 40 594 58 Q 572 98 478 104 Q 380 108 300 100 Q 286 118 270 106 L 256 99 L 248 98 Q 239.5 107.0 231.0 98 Q 222.5 107.0 214.0 98 Q 205.5 107.0 197.0 98 Q 188.5 107.0 180.0 98 Q 171.5 107.0 163.0 98 Q 154.5 107.0 146.0 98 Q 137.5 107.0 129.0 98 Q 120.5 107.0 112.0 98 Q 103.5 107.0 95.0 98 Q 86.5 107.0 78.0 98 Q 69.5 107.0 61.0 98 L 44 94 Q 14 92 12 75 Q 14 58 44 56 L 61.0 52 Q 69.5 43.0 78.0 52 Q 86.5 43.0 95.0 52 Q 103.5 43.0 112.0 52 Q 120.5 43.0 129.0 52 Q 137.5 43.0 146.0 52 Q 154.5 43.0 163.0 52 Q 171.5 43.0 180.0 52 Q 188.5 43.0 197.0 52 Q 205.5 43.0 214.0 52 Q 222.5 43.0 231.0 52 Q 239.5 43.0 248.0 52 L 250 50 Z M 23 75 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 Z',
+  kukri: 'M 28 36 L 50 50 L 92 48 Q 102 42 112 48 L 152 46 Q 162 40 172 46 L 196 42 L 206 44 Q 300 30 400 40 Q 500 52 560 92 Q 590 112 598 136 Q 572 146 536 140 Q 470 128 410 104 Q 350 84 280 82 L 248 82 Q 240 94 232 86 Q 228 80 222 84 L 206 86 L 196 88 L 172 86 Q 162 92 152 86 L 112 84 Q 102 90 92 84 L 50 82 L 28 92 Q 10 62 28 36 Z',
+};
+const KEYS = ['navaja', 'survival', 'paracord', 'kukri'];
+
+/* "skins" que passam dentro da silhueta, como uma roleta (só cores, a skin real é surpresa) */
+const SKINS = [
+  ['#ffe45c', '#ff5fa8', '#8a4dff'], ['#ff2fae', '#3b0ca8', '#050010'], ['#3dffb0', '#00915a', '#002b1c'],
+  ['#ff4f6d', '#c2002f', '#3a000d'], ['#6fb6ff', '#1747d4', '#05103d'], ['#ffe27a', '#ff9d00', '#a14d00'],
+  ['#e01b2f', '#5a0010', '#1a0005'], ['#5aa0d8', '#d8b04a', '#6a4a1a'], ['#ff3d3d', '#ffe44d', '#3c6cff'],
+  ['#9a7dff', '#2b1060', '#0c0420'],
+];
+const PANEL = 640, PANELS = 9;
+
+/* ---------- utilidades ---------- */
+const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
+const prog = (t, s, d) => clamp((t - s) / d);
+const lerp = (a, b, k) => a + (b - a) * k;
+const ease = {
+  outExpo: x => x >= 1 ? 1 : 1 - Math.pow(2, -10 * x),
+  outCubic: x => 1 - Math.pow(1 - x, 3),
+  outQuint: x => 1 - Math.pow(1 - x, 5),
+  inCubic: x => x * x * x,
+  inOutCubic: x => x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2,
+  inOutSine: x => -(Math.cos(Math.PI * x) - 1) / 2,
+  outBack: x => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); },
+};
+/* entrada (s, din) e saída (e, dout) combinadas em 0..1 */
+const env = (t, s, din, e, dout, ei = ease.outCubic, eo = ease.inCubic) =>
+  ei(prog(t, s, din)) * (1 - eo(prog(t, e, dout)));
+
+function el(tag, attrs = {}, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function place(node, x, y) { node.style.left = x + 'px'; node.style.top = y + 'px'; }
+function put(node, { x = 0, y = 0, s = 1, sx = 1, sy = 1, r = 0, o = 1 } = {}) {
+  node.style.transform = `translate(-50%,-50%) translate3d(${x.toFixed(2)}px,${y.toFixed(2)}px,0) rotate(${r.toFixed(3)}deg) scale(${(s * sx).toFixed(4)},${(s * sy).toFixed(4)})`;
+  node.style.opacity = o.toFixed(3);
+  node.style.visibility = o <= 0.002 ? 'hidden' : 'visible';
+}
+function putScene(node, { y = 0, s = 1, o = 1 } = {}) {
+  node.style.transform = `translate3d(0,${y.toFixed(2)}px,0) scale(${s.toFixed(4)})`;
+  node.style.opacity = o.toFixed(3);
+  node.style.visibility = o <= 0.002 ? 'hidden' : 'visible';
+}
+function drawPath(p, k) { p.style.strokeDashoffset = (1 - k).toFixed(4); p.style.opacity = k > 0.001 ? 1 : 0; }
+function sheen(node, k, offsetLeft = 0, parentW = node.offsetWidth) {
+  const S = parentW * 3, X = lerp(-0.35 * parentW, 1.35 * parentW, k);
+  node.style.backgroundSize = `${S}px 100%, 100% 100%`;
+  node.style.backgroundPosition = `${(X - S / 2 - offsetLeft).toFixed(1)}px 0, 0 0`;
+}
+
+/* retângulo art déco com cantos em degraus (sentido horário) */
+function steppedRect(x, y, w, h, s, n) {
+  const c = [[0, n * s]];
+  for (let k = 1; k <= n; k++) { c.push([k * s, (n - k + 1) * s]); c.push([k * s, (n - k) * s]); }
+  const rev = c.slice().reverse();
+  const pts = [
+    ...c.map(([u, v]) => [x + u, y + v]),
+    ...rev.map(([u, v]) => [x + w - u, y + v]),
+    ...c.map(([u, v]) => [x + w - u, y + h - v]),
+    ...rev.map(([u, v]) => [x + u, y + h - v]),
+  ];
+  return 'M ' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L ') + ' Z';
+}
+/* leque art déco: raios saindo de (cx,cy) entre os ângulos a0..a1 */
+function fan(g, cx, cy, r0, r1, a0, a1, n, attrs) {
+  for (let i = 0; i <= n; i++) {
+    const a = (lerp(a0, a1, i / n) - 90) * Math.PI / 180;
+    el('line', { x1: cx + Math.cos(a) * r0, y1: cy + Math.sin(a) * r0, x2: cx + Math.cos(a) * r1, y2: cy + Math.sin(a) * r1, ...attrs }, g);
+  }
+}
+const GOLD = { stroke: 'url(#goldStroke)', fill: 'none' };
+
+/* ---------- elementos construídos por código ---------- */
+const defs = $('defs');
+KEYS.forEach(k => { const cp = el('clipPath', { id: 'clip-' + k }, defs); el('path', { d: KNIVES[k], 'clip-rule': 'evenodd' }, cp); });
+SKINS.forEach((c, i) => {
+  const g = el('linearGradient', { id: 'sk' + i, x1: 0, y1: i % 2 ? 0 : 1, x2: 1, y2: i % 2 ? 1 : 0 }, defs);
+  c.forEach((col, j) => el('stop', { offset: j / (c.length - 1), 'stop-color': col }, g));
+});
+
+function makeKnife(key, widthPx, strokeW, skinOffset) {
+  const svg = el('svg', { viewBox: '-10 -10 620 170', width: widthPx, height: widthPx * 170 / 620, class: 'knife' });
+  el('path', { d: KNIVES[key], fill: 'url(#silh)', 'fill-rule': 'evenodd' }, svg);
+  const clip = el('g', { 'clip-path': `url(#clip-${key})` }, svg);
+  const strip = el('g', {}, clip);
+  for (let j = 0; j < PANELS; j++) {
+    el('rect', { x: -10 + j * PANEL, y: -10, width: PANEL - 16, height: 170, fill: `url(#sk${(j + skinOffset) % SKINS.length})` }, strip);
+  }
+  const glint = el('rect', { x: -10, y: -20, width: 130, height: 200, fill: 'url(#glintG)' }, clip);
+  const edge = el('path', { d: KNIVES[key], fill: 'none', stroke: 'url(#goldStroke)', 'stroke-width': strokeW, 'stroke-linejoin': 'round', pathLength: 1, class: 'draw' }, svg);
+  return { svg, strip, glint, edge };
+}
+function setKnife(kn, { draw = 1, roll = 0, stripO = 0, glint = -1 }) {
+  drawPath(kn.edge, draw);
+  kn.strip.setAttribute('transform', `translate(${(-roll * (PANELS - 1) * PANEL).toFixed(1)},0)`);
+  kn.strip.style.opacity = stripO.toFixed(3);
+  kn.glint.setAttribute('transform', `translate(${lerp(-200, 700, glint).toFixed(1)},0) skewX(-22)`);
+  kn.glint.style.opacity = glint > 0 && glint < 1 ? 1 : 0;
+}
+
+function buildMedal(svg, size) {
+  const r = size / 2;
+  svg.setAttribute('viewBox', `${-r} ${-r} ${size} ${size}`);
+  svg.setAttribute('width', size); svg.setAttribute('height', size);
+  const paths = [];
+  const d = r * 0.98;
+  paths.push(el('path', { d: `M 0 ${-d} L ${d} 0 L 0 ${d} L ${-d} 0 Z`, ...GOLD, 'stroke-width': 3, pathLength: 1, class: 'draw' }, svg));
+  const fill = el('circle', { r: r * 0.53, fill: 'url(#medFill)' }, svg);
+  paths.push(el('circle', { r: r * 0.8, ...GOLD, 'stroke-width': 3, pathLength: 1, class: 'draw', transform: 'rotate(-90)' }, svg));
+  paths.push(el('circle', { r: r * 0.74, ...GOLD, 'stroke-width': 1.2, pathLength: 1, class: 'draw', transform: 'rotate(90)' }, svg));
+  paths.push(el('circle', { r: r * 0.53, ...GOLD, 'stroke-width': 2.4, pathLength: 1, class: 'draw', transform: 'rotate(-90)' }, svg));
+  const rays = el('g', {}, svg);
+  fan(rays, 0, 0, r * 0.57, r * 0.7, 0, 360 - 360 / 48, 47, { ...GOLD, 'stroke-width': 1.6 });
+  return { paths, rays, fill };
+}
+
+/* raios de sol ao fundo */
+const raysSvg = $('rays');
+raysSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+const raysG = el('g', {}, raysSvg);
+(() => {
+  const R = 1500, n = 36;
+  let d = '';
+  for (let i = 0; i < n; i++) {
+    const a0 = (i / n) * Math.PI * 2, a1 = a0 + Math.PI / n * 0.9;
+    d += `M 0 0 L ${(Math.cos(a0) * R).toFixed(1)} ${(Math.sin(a0) * R).toFixed(1)} L ${(Math.cos(a1) * R).toFixed(1)} ${(Math.sin(a1) * R).toFixed(1)} Z `;
+  }
+  el('path', { d, fill: 'url(#rayG)' }, raysG);
+  for (let i = 0; i < 3; i++) el('circle', { r: 260 + i * 210, fill: 'none', stroke: '#e6b545', 'stroke-opacity': .10 - i * .025, 'stroke-width': 2 }, raysG);
+})();
+
+/* moldura */
+const frameSvg = $('frame');
+frameSvg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+const frameParts = { lines: [], orn: el('g', {}, frameSvg) };
+(() => {
+  frameParts.lines.push(el('path', { d: steppedRect(30, 30, W - 60, H - 60, 14, 3), ...GOLD, 'stroke-width': 3, pathLength: 1, class: 'draw' }, frameSvg));
+  frameParts.lines.push(el('path', { d: steppedRect(46, 46, W - 92, H - 92, 12, 3), ...GOLD, 'stroke-width': 1.2, pathLength: 1, class: 'draw' }, frameSvg));
+  const o = frameParts.orn;
+  [[46, 46, 90, 180], [W - 46, 46, 180, 270], [W - 46, H - 46, 270, 360], [46, H - 46, 0, 90]].forEach(([cx, cy, a0, a1]) => {
+    fan(o, cx, cy, 30, 92, a0 + 8, a1 - 8, 6, { ...GOLD, 'stroke-width': 1.4 });
+  });
+  const dm = (x, y, s) => el('path', { d: `M ${x} ${y - s} L ${x + s} ${y} L ${x} ${y + s} L ${x - s} ${y} Z`, fill: '#e6b545' }, o);
+  dm(W / 2, 30, 10); dm(W / 2, H - 30, 10); dm(30, H / 2, 10); dm(W - 30, H / 2, 10);
+})();
+
+/* divisória com losango central */
+function buildDivider(svg, w) {
+  svg.setAttribute('width', w); svg.setAttribute('height', 40);
+  svg.setAttribute('viewBox', `${-w / 2} -20 ${w} 40`);
+  el('line', { x1: -w / 2, y1: 0, x2: -26, y2: 0, stroke: '#e6b545', 'stroke-width': 2 }, svg);
+  el('line', { x1: 26, y1: 0, x2: w / 2, y2: 0, stroke: '#e6b545', 'stroke-width': 2 }, svg);
+  el('line', { x1: -w / 2 + 40, y1: 8, x2: -40, y2: 8, stroke: '#e6b545', 'stroke-width': 1, 'stroke-opacity': .6 }, svg);
+  el('line', { x1: 40, y1: 8, x2: w / 2 - 40, y2: 8, stroke: '#e6b545', 'stroke-width': 1, 'stroke-opacity': .6 }, svg);
+  el('path', { d: 'M 0 -14 L 14 0 L 0 14 L -14 0 Z', fill: '#e6b545' }, svg);
+  el('path', { d: 'M 0 -6 L 6 0 L 0 6 L -6 0 Z', fill: '#1b0630' }, svg);
+}
+/* arco/janela art déco com leque no topo */
+function buildArch(svg, w, h, bottomFan = true) {
+  const m = 120;
+  svg.setAttribute('width', w + m * 2); svg.setAttribute('height', h + m * 2);
+  svg.setAttribute('viewBox', `${-m} ${-m} ${w + m * 2} ${h + m * 2}`);
+  el('path', { d: steppedRect(0, 0, w, h, 22, 3), fill: 'url(#spot)' }, svg);
+  const a = el('path', { d: steppedRect(0, 0, w, h, 22, 3), ...GOLD, 'stroke-width': 3, pathLength: 1, class: 'draw' }, svg);
+  const b = el('path', { d: steppedRect(16, 16, w - 32, h - 32, 18, 3), ...GOLD, 'stroke-width': 1.2, pathLength: 1, class: 'draw' }, svg);
+  const orn = el('g', {}, svg);
+  fan(orn, w / 2, 0, 40, 110, -80, 80, 16, { ...GOLD, 'stroke-width': 1.6 });
+  if (bottomFan) fan(orn, w / 2, h, 40, 90, 110, 250, 12, { ...GOLD, 'stroke-width': 1.4 });
+  el('circle', { cx: w / 2, cy: 0, r: 30, fill: '#1b0630', stroke: 'url(#goldStroke)', 'stroke-width': 2.4 }, orn);
+  el('circle', { cx: w / 2, cy: 0, r: 8, fill: '#e6b545' }, orn);
+  return { lines: [a, b], orn };
+}
+/* fundo em degraus para caixas de texto */
+function boxBg(box, s, n) {
+  const w = box.offsetWidth, h = box.offsetHeight;
+  const svg = el('svg', { class: 'boxbg', width: w, height: h, viewBox: `0 0 ${w} ${h}` });
+  el('path', { d: steppedRect(1.5, 1.5, w - 3, h - 3, s, n), fill: 'rgba(14,3,24,.85)' }, svg);
+  const a = el('path', { d: steppedRect(1.5, 1.5, w - 3, h - 3, s, n), ...GOLD, 'stroke-width': 3, pathLength: 1, class: 'draw' }, svg);
+  const b = el('path', { d: steppedRect(9, 9, w - 18, h - 18, s * .8, n), ...GOLD, 'stroke-width': 1, pathLength: 1, class: 'draw' }, svg);
+  box.prepend(svg);
+  return [a, b];
+}
+
+/* ---------- layout (posições-âncora em px do palco) ---------- */
+const L = VERTICAL ? {
+  aMed: [540, 690, 560], aRow: [540, 1240], aSub: [540, 1560],
+  bTitle: [540, 520], bDiv: [540, 680, 760], bRow: [540, 1150],
+  cArch: [540, 820, 960, 1000], cKnife: [540, 820, 900, -16], cPlaque: [540, 320], cKicker: [540, 1420], cName: [540, 1520], cDots: [540, 1640],
+  dPivot: [540, 1380], dK: 0.8, dDist: 110, dAng: [-46, -15, 15, 46], dMed: 240, dTitle: [540, 470], dNames: [540, 1640],
+  eArch: [540, 600, 860, 760], eImg: [540, 600], eKicker: [540, 1080], eTitle: [540, 1195], eDiv: [540, 1300, 700], eDate: [540, 1420], ePartners: [540, 1575], eCta: [540, 1680],
+} : {
+  aMed: [960, 410, 440], aRow: [960, 790], aSub: [960, 905],
+  bTitle: [960, 300], bDiv: [960, 452, 980], bRow: [960, 700],
+  cArch: [960, 492, 1540, 600], cKnife: [960, 492, 1300, -5], cPlaque: [960, 192], cKicker: [960, 846], cName: [960, 935], cDots: [960, 1010],
+  dPivot: [960, 870], dK: 1.0, dDist: 128, dAng: [-54, -18, 18, 54], dMed: 250, dTitle: [960, 118], dNames: [960, 1000],
+  eArch: [560, 556, 780, 800], eImg: [560, 590], eKicker: [1350, 270], eTitle: [1350, 380], eDiv: [1350, 480, 640], eDate: [1350, 600], ePartners: [1350, 750], eCta: [1350, 850],
+};
+
+/* cena A */
+const aMedal = buildMedal($('aMedSvg'), L.aMed[2]);
+$('aMed').style.width = $('aMed').style.height = L.aMed[2] + 'px';
+place($('aMed'), L.aMed[0], L.aMed[1]); place($('aRow'), ...L.aRow); place($('aSub'), ...L.aSub);
+
+/* cena B */
+const bTitle = $('bTitle');
+'SORTEIO'.split('').forEach(ch => { const s = document.createElement('span'); s.className = 'gold'; s.textContent = ch; bTitle.appendChild(s); });
+const bLetters = [...bTitle.children];
+place(bTitle, ...L.bTitle);
+buildDivider($('bDiv'), L.bDiv[2]); place($('bDiv'), L.bDiv[0], L.bDiv[1]);
+place($('bRow'), ...L.bRow);
+const bRing = $('bRing');
+const bRingC = [el('circle', { r: 90, fill: 'none', stroke: '#e6b545', 'stroke-width': 1.5 }, bRing), el('circle', { r: 80, fill: 'none', stroke: '#ff4fd0', 'stroke-width': 1 }, bRing)];
+fan(el('g', {}, bRing), 0, 0, 92, 99, 0, 352.5, 47, { stroke: '#e6b545', 'stroke-width': 1 });
+
+/* cena C */
+const cArch = buildArch($('cArch'), L.cArch[2], L.cArch[3], false);
+place($('cArch'), L.cArch[0], L.cArch[1]);
+const cKnives = KEYS.map((k, i) => {
+  const kn = makeKnife(k, L.cKnife[2], 1.7, i * 3);
+  $('cKnives').appendChild(kn.svg); place(kn.svg, L.cKnife[0], L.cKnife[1]);
+  return kn;
+});
+place($('cPlaqueWrap'), ...L.cPlaque); place($('cKicker'), ...L.cKicker);
+place($('cNameMask'), ...L.cName); place($('cDots'), ...L.cDots);
+const cNames = CONFIG.modelos.map(n => { const s = document.createElement('div'); s.className = 'deco gold'; s.textContent = n; $('cNameMask').appendChild(s); return s; });
+const cDots = [...$('cDots').children];
+
+/* cena D */
+const dKnives = KEYS.map((k, i) => {
+  const kn = makeKnife(k, 620 * L.dK, 3, i * 2 + 1);
+  $('dKnives').appendChild(kn.svg);
+  return kn;
+});
+const dMedal = buildMedal($('dMedSvg'), L.dMed);
+$('dMed').style.width = $('dMed').style.height = L.dMed + 'px';
+place($('dMed'), L.dPivot[0], L.dPivot[1]);
+place($('dTitle'), ...L.dTitle);
+$('dNames').innerHTML = CONFIG.modelos.join('<span class="dia"></span>');
+place($('dNames'), ...L.dNames);
+
+/* cena E */
+const eArch = buildArch($('eArch'), L.eArch[2], L.eArch[3], false);
+place($('eArch'), L.eArch[0], L.eArch[1]);
+place($('eImg'), ...L.eImg); place($('eKicker'), ...L.eKicker); place($('eTitle'), ...L.eTitle);
+buildDivider($('eDiv'), L.eDiv[2]); place($('eDiv'), L.eDiv[0], L.eDiv[1]);
+place($('eDateWrap'), ...L.eDate); place($('ePartners'), ...L.ePartners); place($('eCta'), ...L.eCta);
+
+/* poeira dourada (determinística e periódica no loop) */
+const dust = $('dust'); dust.width = W; dust.height = H;
+const dctx = dust.getContext('2d');
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const P = Array.from({ length: 80 }, () => ({
+  x: rnd() * W, y: rnd() * H, r: .8 + rnd() * 2.6, laps: 1 + Math.floor(rnd() * 3),
+  amp: 10 + rnd() * 40, wob: 1 + Math.floor(rnd() * 4), ph: rnd() * 6.283, a: .25 + rnd() * .6, pink: rnd() < .25,
+}));
+function drawDust(t) {
+  dctx.clearRect(0, 0, W, H);
+  dctx.globalCompositeOperation = 'lighter';
+  const u = t / DUR;
+  for (const p of P) {
+    const y = ((p.y - u * p.laps * (H + 40)) % (H + 40) + H + 40) % (H + 40) - 20;
+    const x = p.x + Math.sin(u * 6.283 * p.wob + p.ph) * p.amp;
+    const tw = .55 + .45 * Math.sin(u * 6.283 * p.wob * 3 + p.ph * 2);
+    const c = p.pink ? '255,79,208' : '251,226,154';
+    dctx.fillStyle = `rgba(${c},${(p.a * tw * .25).toFixed(3)})`;
+    dctx.beginPath(); dctx.arc(x, y, p.r * 3.2, 0, 6.283); dctx.fill();
+    dctx.fillStyle = `rgba(${c},${(p.a * tw).toFixed(3)})`;
+    dctx.beginPath(); dctx.arc(x, y, p.r, 0, 6.283); dctx.fill();
+  }
+}
+
+/* granulado de filme */
+(() => {
+  const c = document.createElement('canvas'); c.width = c.height = 256;
+  const x = c.getContext('2d'), img = x.createImageData(256, 256);
+  for (let i = 0; i < img.data.length; i += 4) { const v = rnd() * 255; img.data[i] = img.data[i + 1] = img.data[i + 2] = v; img.data[i + 3] = 255; }
+  x.putImageData(img, 0, 0);
+  $('grain').style.backgroundImage = `url(${c.toDataURL()})`;
+})();
+
+const streaks = [...$('streaks').children];
+
+/* ======================= LINHA DO TEMPO ======================= */
+function raysCenter(t) {
+  const keys = [[T.A, L.aMed], [T.B, [W / 2, H / 2]], [T.C, L.cArch], [T.D, L.dPivot], [T.E, L.eImg]];
+  let c = keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const k = ease.inOutCubic(prog(t, keys[i][0] - .5, 1.0));
+    c = [lerp(c[0], keys[i][1][0], k), lerp(c[1], keys[i][1][1], k)];
+  }
+  return c;
+}
+const T = { A: 0, B: 4.0, C: 8.55, D: 18.9, E: 23.1 };
+const SLOT = 2.55;
+let lastMeasure = null;
+
+function render(t) {
+  const u = t / DUR;
+
+  /* fundo */
+  const intro = ease.outExpo(prog(t, 0.05, 1.8));
+  const outro = 1 - ease.inOutCubic(prog(t, DUR - 0.75, 0.75));
+  const pulse = (c, w = .6) => Math.exp(-Math.pow((t - c) / w, 2));
+  const raysO = (0.55 + 0.45 * pulse(1.1) + 0.35 * pulse(6.35, .5) + 0.5 * pulse(19.9, .8) + 0.35 * pulse(24.2, .8)) * intro * outro;
+  const rc = raysCenter(t);
+  raysG.setAttribute('transform', `translate(${rc[0]},${rc[1]}) rotate(${(u * 360 / 4).toFixed(3)}) scale(${lerp(.15, 1, intro).toFixed(4)})`);
+  raysSvg.style.opacity = clamp(raysO, 0, 1.4).toFixed(3);
+  streaks.forEach((s, i) => {
+    const k = (u + i / 3) % 1;
+    s.style.top = (H * (0.18 + i * 0.3)) + 'px';
+    s.style.transform = `rotate(-24deg) translate3d(${lerp(-W * .35, W * .35, k).toFixed(1)}px,0,0)`;
+    s.style.opacity = (Math.sin(k * Math.PI) * .45 * outro * intro).toFixed(3);
+  });
+  drawDust(t);
+  $('dust').style.opacity = (intro * outro).toFixed(3);
+  const fl = 0.9 * pulse(1.05, .18) + 0.5 * pulse(6.3, .14) + 0.55 * pulse(19.75, .2) + 0.4 * pulse(23.95, .2);
+  $('flash').style.opacity = fl.toFixed(3);
+  const fr = Math.floor(t * 24);
+  $('grain').style.backgroundPosition = `${(fr * 73) % 256}px ${(fr * 151) % 256}px`;
+
+  /* moldura */
+  frameParts.lines.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(t, 0.15 + i * .2, 1.5))));
+  frameParts.orn.style.opacity = ease.outCubic(prog(t, 1.2, .8)).toFixed(3);
+  frameSvg.style.opacity = outro.toFixed(3);
+
+  /* ---- A · abertura ---- */
+  {
+    const sA = $('sA');
+    const out = ease.inCubic(prog(t, T.B - .45, .6));
+    putScene(sA, { s: lerp(1, 1.14, out), o: 1 - out });
+    if (t < T.B + .3) {
+      aMedal.paths.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(t, .2 + i * .14, 1.1))));
+      aMedal.rays.style.opacity = ease.outCubic(prog(t, .9, .6));
+      aMedal.rays.setAttribute('transform', `rotate(${(t * 6).toFixed(2)})`);
+      const mk = ease.outExpo(prog(t, .15, 1.6));
+      put($('aMed'), { s: lerp(.8, 1, mk), r: lerp(-45, 0, mk), o: ease.outCubic(prog(t, .15, .5)) });
+      aMedal.fill.style.opacity = ease.outCubic(prog(t, .55, .6)).toFixed(3);
+      const pk = ease.outBack(prog(t, .9, .8));
+      const img = $('aMed').querySelector('img');
+      img.style.transform = `translate(-50%,-50%) scale(${lerp(.4, 1, pk).toFixed(4)})`;
+      img.style.opacity = ease.outCubic(prog(t, .9, .4)).toFixed(3);
+      put($('aRow'));
+      const dk = ease.outExpo(prog(t, 1.45, 1.0)), gk = ease.outExpo(prog(t, 1.6, 1.0)), xk = ease.outBack(prog(t, 1.8, .7));
+      const off = VERTICAL ? 0 : 160;
+      $('aDan').style.transform = `translate(${lerp(-off, 0, dk)}px,${VERTICAL ? lerp(-60, 0, dk) : 0}px)`; $('aDan').style.opacity = dk;
+      $('aG4').style.transform = `translate(${lerp(off, 0, gk)}px,${VERTICAL ? lerp(60, 0, gk) : 0}px)`; $('aG4').style.opacity = gk;
+      $('aX').style.transform = `rotate(${lerp(-180, 0, xk)}deg) scale(${xk})`; $('aX').style.opacity = clamp(xk);
+      sheen($('aDan'), ease.inOutSine(prog(t, 2.4, 1.1)));
+      const sk = ease.outCubic(prog(t, 2.2, 1.0));
+      $('aSub').style.letterSpacing = lerp(1.1, .6, sk) + 'em';
+      put($('aSub'), { o: sk, y: lerp(14, 0, sk) });
+    }
+  }
+
+  /* ---- B · "SORTEIO 10 FACAS" ---- */
+  {
+    const sB = $('sB');
+    const inO = prog(t, T.B - .1, .2), out = ease.inCubic(prog(t, T.C - .5, .55));
+    putScene(sB, { y: lerp(0, -70, out), o: inO * (1 - out) });
+    if (t > T.B - .2 && t < T.C + .2) {
+      const tb = t - T.B;
+      if (!lastMeasure) lastMeasure = { w: bTitle.offsetWidth, l: bLetters.map(s => s.offsetLeft) };
+      put(bTitle);
+      bLetters.forEach((s, i) => {
+        const k = prog(tb, .15 + i * .07, .85);
+        s.style.transform = `translateY(${lerp(-110, 0, ease.outBack(k)).toFixed(1)}px) rotate(${lerp(-14, 0, ease.outCubic(k)).toFixed(2)}deg)`;
+        s.style.opacity = ease.outCubic(clamp(k * 2)).toFixed(3);
+        sheen(s, ease.inOutSine(prog(tb, 1.6, 1.3)), lastMeasure.l[i], lastMeasure.w);
+      });
+      const dv = ease.outExpo(prog(tb, .7, 1.1));
+      put($('bDiv'), { sx: Math.max(dv, .001), o: clamp(dv * 3) });
+      put($('bRow'));
+      const nk = prog(tb, 1.05, 1.25);
+      const n = Math.min(10, 1 + Math.floor(ease.outCubic(nk) * 9.999));
+      const num = $('bNum');
+      if (num.textContent !== String(n)) num.textContent = n;
+      const tick = (ease.outCubic(nk) * 9.999) % 1;
+      const ns = lerp(.55, 1, ease.outBack(prog(tb, 1.0, .7))) * (1 + (nk < 1 ? .05 * (1 - tick) : 0)) * (1 + .1 * pulse(T.B + 2.32, .12));
+      num.style.transform = `scale(${ns.toFixed(4)})`;
+      num.style.opacity = ease.outCubic(prog(tb, 1.0, .3)).toFixed(3);
+      sheen(num, ease.inOutSine(prog(tb, 2.4, 1.0)));
+      const rk = prog(tb, 2.25, 1.2);
+      bRing.style.transform = `translate(-50%,-50%) scale(${lerp(.55, 1.0, ease.outExpo(rk)).toFixed(4)}) rotate(${(tb * 10).toFixed(2)}deg)`;
+      bRing.style.opacity = (rk > 0 ? lerp(1, .35, ease.outCubic(rk)) : 0).toFixed(3);
+      const fk = ease.outExpo(prog(tb, 1.5, 1.1));
+      $('bFacas').style.transform = VERTICAL ? `translateY(${lerp(80, 0, fk)}px)` : `translateX(${lerp(120, 0, fk)}px)`;
+      $('bFacas').style.opacity = fk;
+      const sk = ease.outCubic(prog(tb, 2.0, 1.0));
+      $('bSkins').style.letterSpacing = lerp(.9, .45, sk) + 'em';
+      $('bSkins').style.opacity = sk;
+    }
+  }
+
+  /* ---- C · revelação de cada modelo ---- */
+  {
+    const sC = $('sC');
+    const inO = ease.outCubic(prog(t, T.C, .5)), out = ease.inCubic(prog(t, T.D - .45, .5));
+    putScene(sC, { o: inO * (1 - out), s: lerp(1, 1.06, out) });
+    if (t > T.C - .1 && t < T.D + .2) {
+      const tc = t - T.C;
+      cArch.lines.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(tc, .05 + i * .15, 1.0))));
+      cArch.orn.style.opacity = ease.outCubic(prog(tc, .6, .6));
+      put($('cArch'), { s: lerp(.96, 1, ease.outExpo(prog(tc, 0, 1.2))) });
+      const pk = ease.outBack(prog(tc, .45, .7));
+      put($('cPlaqueWrap'), { s: lerp(.6, 1, pk), o: clamp(pk) });
+      $('cQ').style.transform = `rotate(${(Math.sin(tc * 2.6) * 14).toFixed(2)}deg) scale(${(1 + .08 * Math.sin(tc * 5.2)).toFixed(3)})`;
+
+      let active = -1;
+      cKnives.forEach((kn, i) => {
+        const s0 = .15 + i * SLOT, ts = tc - s0;
+        const kin = ease.outExpo(prog(ts, 0, .9)), kout = ease.inCubic(prog(ts, SLOT - .45, .45));
+        const vis = ts > -0.05 && ts < SLOT + .05;
+        if (ts >= 0 && ts < SLOT) active = i;
+        const travel = VERTICAL ? 1250 : 1500;
+        put(kn.svg, {
+          x: lerp(-travel, 0, kin) + lerp(0, travel, kout),
+          y: lerp(60, 0, kin) + lerp(0, -40, kout),
+          r: lerp(-32, L.cKnife[3], kin) + lerp(0, 22, kout),
+          s: lerp(.82, 1, kin) * lerp(1, .9, kout),
+          o: vis ? clamp(ts * 6) * (1 - kout * .6) : 0,
+        });
+        if (vis) {
+          const rollK = prog(ts, .5, 1.3);
+          setKnife(kn, {
+            draw: ease.outCubic(prog(ts, .1, .9)),
+            roll: ease.outCubic(rollK),
+            stripO: env(ts, .45, .2, 1.55, .4) * .95,
+            glint: prog(ts, 1.75, .55),
+          });
+        }
+        const nm = cNames[i], mh = VERTICAL ? 170 : 150;
+        const nin = ease.outExpo(prog(ts, .3, .8)), nout = ease.inCubic(prog(ts, SLOT - .5, .4));
+        nm.style.transform = `translate(-50%,-50%) translateY(${(lerp(mh, 0, nin) + lerp(0, -mh, nout)).toFixed(1)}px)`;
+        nm.style.visibility = ts > 0 && ts < SLOT ? 'visible' : 'hidden';
+        if (ts > 0 && ts < SLOT) sheen(nm, ease.inOutSine(prog(ts, .9, 1.0)));
+      });
+      const ki = Math.max(0, active);
+      const kt = tc - (.15 + ki * SLOT);
+      const kk = $('cKicker'), txt = `MODELO 0${ki + 1} / 0${KEYS.length}`;
+      if (kk.textContent !== txt) kk.textContent = txt;
+      put(kk, { o: env(kt, .25, .4, SLOT - .45, .3), y: lerp(16, 0, ease.outCubic(prog(kt, .25, .5))) });
+      put($('cNameMask'));
+      put($('cDots'), { o: ease.outCubic(prog(tc, .4, .5)) });
+      cDots.forEach((d, i) => { d.style.background = i === active ? 'var(--gold)' : 'transparent'; d.style.boxShadow = i === active ? '0 0 12px rgba(230,181,69,.8)' : 'none'; });
+    }
+  }
+
+  /* ---- D · leque com os 4 modelos ---- */
+  {
+    const sD = $('sD');
+    const inO = prog(t, T.D - .1, .2), out = ease.inCubic(prog(t, T.E - .4, .5));
+    putScene(sD, { o: inO * (1 - out) });
+    if (t > T.D - .2 && t < T.E + .2) {
+      const td = t - T.D;
+      const [px, py] = L.dPivot;
+      const mk = ease.outBack(prog(td, .05, .8));
+      put($('dMed'), { s: lerp(.3, 1, mk) * lerp(1, .6, ease.inCubic(prog(td, 3.9, .4))), r: lerp(-90, 0, ease.outExpo(prog(td, .05, 1.2))), o: clamp(mk) });
+      dMedal.paths.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(td, .1 + i * .08, .8))));
+      dMedal.rays.setAttribute('transform', `rotate(${(td * 12).toFixed(2)})`);
+      dKnives.forEach((kn, i) => {
+        const k = ease.outExpo(prog(td, .3 + i * .09, 1.3));
+        const ko = ease.inCubic(prog(td, 3.75 + i * .04, .5));
+        const a = (-90 + lerp(0, L.dAng[i], k)) * Math.PI / 180;
+        const dist = lerp(20, L.dDist, k) + 300 * L.dK + ko * 420;
+        put(kn.svg, {
+          x: px + Math.cos(a) * dist, y: py + Math.sin(a) * dist,
+          r: a * 180 / Math.PI, sy: L.dAng[i] > 0 ? -1 : 1,
+          s: lerp(.7, 1, k), o: clamp(k * 2) * (1 - ko),
+        });
+        setKnife(kn, { draw: ease.outCubic(prog(td, .35 + i * .09, 1.0)), roll: 1, stripO: 0, glint: prog(td, 1.6 + i * .16, .6) });
+      });
+      const tk = ease.outExpo(prog(td, .6, 1.0));
+      put($('dTitle'), { y: lerp(-40, 0, tk), o: tk * (1 - ease.inCubic(prog(td, 3.8, .4))) });
+      sheen($('dTitle'), ease.inOutSine(prog(td, 1.5, 1.2)));
+      const nk = ease.outCubic(prog(td, 1.1, 1.0));
+      $('dNames').style.letterSpacing = lerp(.8, .3, nk) + 'em';
+      put($('dNames'), { o: nk * (1 - ease.inCubic(prog(td, 3.8, .4))), y: lerp(20, 0, nk) });
+    }
+  }
+
+  /* ---- E · card final ---- */
+  {
+    const sE = $('sE');
+    const inO = prog(t, T.E - .1, .2);
+    putScene(sE, { o: inO * outro, s: lerp(1, 1.035, ease.inCubic(prog(t, DUR - .75, .75))) });
+    if (t > T.E - .2) {
+      const te = t - T.E;
+      eArch.lines.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(te, .05 + i * .15, 1.1))));
+      eArch.orn.style.opacity = ease.outCubic(prog(te, .7, .6));
+      put($('eArch'), { s: lerp(.9, 1, ease.outExpo(prog(te, 0, 1.3))) });
+      const ik = ease.outExpo(prog(te, .3, 1.3));
+      put($('eImg'), { y: lerp(110, 0, ik) + Math.sin(te * 1.4) * 6 * ik, s: lerp(.9, 1, ik), o: ease.outCubic(prog(te, .3, .5)) });
+      const item = (id, s0, dy = 40) => { const k = ease.outExpo(prog(te, s0, 1.0)); put($(id), { y: lerp(dy, 0, k), o: ease.outCubic(prog(te, s0, .5)) }); return k; };
+      const kk = item('eKicker', .55); $('eKicker').style.letterSpacing = lerp(.9, .45, kk) + 'em';
+      item('eTitle', .7, 60); sheen($('eTitle'), ease.inOutSine(prog(te, 1.6, 1.2)));
+      const dv = ease.outExpo(prog(te, .9, 1.1)); put($('eDiv'), { sx: Math.max(dv, .001), o: clamp(dv * 3) });
+      const dk = ease.outBack(prog(te, 1.05, .8));
+      put($('eDateWrap'), { s: lerp(.7, 1, dk), o: clamp(dk) });
+      eDateLines.forEach((p, i) => drawPath(p, ease.inOutCubic(prog(te, 1.1 + i * .15, .9))));
+      $('eDate').style.letterSpacing = lerp(.25, .04, ease.outCubic(prog(te, 1.05, 1.0))) + 'em';
+      item('ePartners', 1.4);
+      item('eCta', 1.6);
+      $('eCta').querySelector('b').style.opacity = (.35 + .65 * (.5 + .5 * Math.cos(te * Math.PI * 2 / 1.2))).toFixed(3);
+    }
+  }
+}
+
+/* caixas em degraus precisam do tamanho real do texto (após carregar a fonte) */
+let cPlaqueLines = [], eDateLines = [];
+
+/* ======================= REPRODUÇÃO ======================= */
+function fit() {
+  const s = Math.min(innerWidth / W, innerHeight / H);
+  stage.style.transform = `translate(-50%,-50%) scale(${s})`;
+}
+addEventListener('resize', fit); fit();
+
+const imgs = [...document.images].map(i => i.complete ? Promise.resolve() : new Promise(r => { i.onload = i.onerror = r; }));
+window.__ready = Promise.all([document.fonts.ready, ...imgs]).then(() => {
+  $('bNum').style.minWidth = $('bNum').offsetWidth + 'px';
+  cPlaqueLines = boxBg($('cPlaque'), 10, 2);
+  eDateLines = boxBg($('eDate'), 14, 3);
+  cPlaqueLines.forEach(p => drawPath(p, 1));
+});
+
+let paused = false, t0 = null;
+window.__seek = t => { paused = true; render(clamp(t, 0, DUR - 1e-3)); };
+window.__duration = DUR;
+window.__size = [W, H];
+
+window.__ready.then(() => {
+  const fixed = params.get('t');
+  if (fixed !== null) { window.__seek(parseFloat(fixed)); return; }
+  const tick = now => {
+    if (paused) return;
+    if (t0 === null) t0 = now;
+    let t = (now - t0) / 1000;
+    if (LOOP) t %= DUR; else t = Math.min(t, DUR - .8);
+    render(t);
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+});
+</script>
+</body>
+</html>
