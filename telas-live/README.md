@@ -1,7 +1,5 @@
 # Telas da live – SHZ4TW
 
-Versões das telas sem nenhuma referência ao Razor Project, com o nick **SHZ4TW**.
-
 | Arquivo | Uso |
 | --- | --- |
 | `tela-comecando.mp4` | "A live começa já!" (1920×1080, 30 fps, 12 s) |
@@ -9,12 +7,11 @@ Versões das telas sem nenhuma referência ao Razor Project, com o nick **SHZ4TW
 | `tela-fim.mp4` | "Fim da live!" (1920×1080, 30 fps, 12 s) |
 | `overlay-webcam.png` | Moldura da webcam com fundo transparente (640×486) |
 
-O que mudou em relação às versões originais:
+O que tem em cada uma:
 
-- O logo do mascote do Razor Project virou um emblema com a foto do SHZ4TW, com os mesmos anéis vermelhos e uma faixa com o nick.
-- A marca d'água "RAZOR PROJECT" no rodapé virou "SHZ4TW", com a mesma fonte (Anton), o mesmo contorno e o mesmo balanço.
-- A legenda do código de barras virou "SHZ4TW — CS2".
-- Na moldura da webcam, "PDR" virou "SHZ4TW", a etiqueta "RAZOR PROJECT · CS2" virou "COUNTER-STRIKE 2" e o logo pequeno também virou a foto.
+- À esquerda, o recorte em meio-tom do SHZ4TW, com o preto ajustado ao fundo da tela e o vermelho no mesmo tom carmim dos títulos. Embaixo dele, a etiqueta "● STREAMER / SHZ4TW".
+- Marca d'água "SHZ4TW" em contorno no rodapé, com legenda "SHZ4TW — CS2" sob o código de barras.
+- Na moldura da webcam: o nick SHZ4TW, a etiqueta "COUNTER-STRIKE 2" e o rosto em meio-tom impresso na faixa preta.
 
 ## No OBS
 
